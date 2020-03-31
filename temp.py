@@ -43,7 +43,7 @@
 #
 ###############################################################################
 
-import csv
+import csv, yaml
 import numpy as np
 import matplotlib.pyplot as plt
 #######################
@@ -61,17 +61,16 @@ try:
 except FileNotFoundError:
     print("Nie ma pliku")
     raise SystemExit
-
-
-dane = csv.reader(plik, delimiter=',')
-next(dane)                # Opuszczamy pierwszy wiersz - nagłówek
-for obserwacja in dane:   # Iterujemy po poszczególnych obserwacjach
-    przeplyw.append(float(obserwacja[6]))
-    temp_zas.append(float(obserwacja[7]))
-    temp_pow.append(float(obserwacja[8]))
-    roznica_temp.append(float(obserwacja[9]))
-    moc.append(float(obserwacja[12]))
-plik.close()
+else:
+    dane = csv.reader(plik, delimiter=',')
+    next(dane)                # Opuszczamy pierwszy wiersz - nagłówek
+    for obserwacja in dane:   # Iterujemy po poszczególnych obserwacjach
+        przeplyw.append(float(obserwacja[6]))
+        temp_zas.append(float(obserwacja[7]))
+        temp_pow.append(float(obserwacja[8]))
+        roznica_temp.append(float(obserwacja[9]))
+        moc.append(float(obserwacja[12]))
+    plik.close()
 
 ### ZADANIE (0.2p.) ###
 # Zabezpieczyć powyższe wczytywanie danych przed:
@@ -176,7 +175,7 @@ for nazwa,zmienna in zmienne.items():
 # Zapisać naprawione dane do pliku dane-naprawione.csv, zachowując zgodność z plikiem oryginalnym.
 ### KONIEC ###
 
-### ZADANIE (0.5p.) ###
+### DONE (0.5p.) ###
 # Zapisać powyższe statystyki i wykresy do plików PDF, osobnych dla poszczególnych zmiennych
 # (można wykorzystać dowolny moduł/bibliotekę).
 ### KONIEC ###
@@ -340,13 +339,13 @@ plt.xlabel('Numer obserwacji')
 plt.ylabel('temp_zas')
 plt.show()
 
-### ZADANIE (0.4p.) ###
+### DONE (0.4p.) ###
 # Przeprowadzić regresję wielomianową wielomianem 2 stopnia dla zmiennej temp_zas.
 # Narysować wykres otrzymanej krzywej na tle zmiennej temp_zas.
 
 print()
 print("REGRESJA WIELOMIANOWA")
-# Wybieramy zmienną temp_in w funkcji numeru obserwacji
+# Wybieramy zmienną temp_zas w funkcji numeru obserwacji
 x = range(len(temp_zas))
 y = temp_zas
 # Liczymy współczynniki regresji - prostej
@@ -397,7 +396,7 @@ for i in range(20):
 predykcja = [[i, a*i+b] for i in roznica_temp]
 print("Wyniki predykcji [roznica_temp, temp_pow]:",predykcja)
 
-### ZADANIE (0.2p.) ###
+### DONE (0.2p.) ###
 # Zapisać wyniki powyższej predykcji do pliku YAML: predykcja.yaml, w formacie:
 # predykcje:
 #   - roznica_temp: X1
@@ -405,4 +404,13 @@ print("Wyniki predykcji [roznica_temp, temp_pow]:",predykcja)
 #   - roznica_temp: X2
 #     temp_pow: Y2
 #   ...
+
+dict = []
+for i in range(len(predykcja)):
+    dict.append([0.0,0.0])
+for i in range(len(predykcja)):
+    dict[i] = {'roznica_temp': roznica_temp[i],'temp_pow': temp_pow[i]}
+dicts = {'predykcje': dict}
+with open('predykcja.yaml', 'w') as file:
+    yaml.dump(dicts, file)
 ### KONIEC ###
